@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vephi/pages/job_details.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -25,15 +26,31 @@ class HomePage extends StatelessWidget {
                 const Text(
                   'Find your next job',
                   style: TextStyle(
-                      color: Color.fromRGBO(27, 27, 27, 1),
-                      fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.notifications,
-                    color: Colors.black,
+                    color: Color.fromRGBO(27, 27, 27, 1),
+                    fontWeight: FontWeight.bold,
                   ),
-                  onPressed: () {},
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.notifications,
+                        color: Colors.black,
+                      ),
+                      padding: const EdgeInsets.all(0),
+                      constraints: const BoxConstraints(),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.bookmark_border,
+                        color: Colors.black,
+                      ),
+                      padding: const EdgeInsets.all(0),
+                      constraints: const BoxConstraints(),
+                      onPressed: () {},
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -48,12 +65,6 @@ class HomePage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFF9F9F9),
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: const [
-                  // BoxShadow(
-                  //   color: Colors.grey,
-                  //   offset: Offset(1, 2),
-                  // ),
-                ],
               ),
               child: const TextField(
                 decoration: InputDecoration(
@@ -63,6 +74,10 @@ class HomePage extends StatelessWidget {
                   border: InputBorder.none,
                   prefixIcon: Icon(
                     Icons.search,
+                    color: Color(0xFF2D82FF),
+                  ),
+                  suffixIcon: Icon(
+                    Icons.filter_list,
                     color: Color(0xFF2D82FF),
                   ),
                   enabledBorder: OutlineInputBorder(
@@ -77,143 +92,181 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
-          Column(
-            children: [
-              Container(
-                alignment: Alignment.topLeft,
-                padding: const EdgeInsets.only(left: 25),
-                child: const Text(
-                  'Best Fit',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Color.fromRGBO(27, 27, 27, 1)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 4,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8),
-            child: SizedBox(
-              height: 162,
-              width: double.infinity,
-              child: Card(
-                elevation: 5,
-                color: const Color(0xFF2D82FF),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CircleAvatar(
-                            backgroundImage:
-                                AssetImage('assets/company_logo.png'),
-                            radius: 20,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 25.0, right: 25),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Best Fit',
+                          style: TextStyle(
+                            color: Color.fromRGBO(27, 27, 27, 1),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
-
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Software Engineer',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 2),
-                              Text(
-                                'Microsoft',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
+                        ),
+                        Text(
+                          'See All',
+                          style: TextStyle(
+                            color: Color.fromRGBO(27, 27, 27, 1),
+                            fontWeight: FontWeight.bold,
                           ),
-                          // Save Icon
-                          Icon(Icons.bookmark_border, color: Colors.white),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Second row with job type and seniority level
-                      Wrap(
-                        spacing: 10,
-                        children: [
-                          // Full Time
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.blue[500],
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                            child: const Text(
-                              'Full Time',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          // Senior Level
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.blue[500],
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                            child: const Text(
-                              'Senior Level',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      // Third row with location and time
-                      const SizedBox(height: 8),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'New York',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            '20 hours ago',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 4),
+
+                  // First Job Card
+                  buildJobCard(context, 'Software Engineer', 'Microsoft',
+                      'Full Time', 'Senior Level', 'New York', '20 hours ago'),
+                  const SizedBox(height: 10),
+
+                  // divider
+                  const Padding(
+                    padding: EdgeInsets.only(top: 0, left: 25, right: 25),
+                    child: Divider(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.topLeft,
+                    padding: const EdgeInsets.only(left: 25),
+                    child: const Text(
+                      'All Jobs',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Color.fromRGBO(27, 27, 27, 1),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Third Job Card (under "All Jobs")
+                  buildJobCard(context, 'Data Analyst', 'Amazon', 'Full Time',
+                      'Entry Level', 'Seattle', '3 days ago'),
+                  const SizedBox(height: 10),
+
+                  // Fourth Job Card (under "All Jobs")
+                  buildJobCard(context, 'Marketing Specialist', 'Facebook',
+                      'Part Time', 'Senior Level', 'Remote', '1 week ago'),
+                ],
               ),
             ),
           ),
-          Column(
-            children: [
-              Container(
-                alignment: Alignment.topLeft,
-                padding: const EdgeInsets.only(left: 25),
-                child: const Text(
-                  'All Jobs',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Color.fromRGBO(27, 27, 27, 1)),
-                ),
-              ),
-            ],
-          ),
         ],
+      ),
+    );
+  }
+
+  Widget buildJobCard(BuildContext context, String title, String company,
+      String type, String level, String location, String time) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const JobDetails()),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8.0, right: 8),
+        child: SizedBox(
+          height: 162,
+          width: double.infinity,
+          child: Card(
+            elevation: 5,
+            color: const Color(0xFF2D82FF),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const CircleAvatar(
+                        backgroundImage: AssetImage('assets/company_logo.png'),
+                        radius: 20,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            company,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Icon(Icons.bookmark_border, color: Colors.white),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 10,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[500],
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Text(
+                          type,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[500],
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Text(
+                          level,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        location,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        time,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

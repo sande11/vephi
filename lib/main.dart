@@ -67,8 +67,8 @@ class _MainScreenState extends State<MainScreen> {
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             tabs: const [
               GButton(icon: Icons.home_filled, text: ''),
-              GButton(icon: Icons.folder_copy_rounded, text: ''),
-              GButton(icon: Icons.list_alt_rounded, text: ''),
+              GButton(icon: Icons.tips_and_updates_rounded, text: ''),
+              GButton(icon: Icons.grading_sharp, text: ''),
               GButton(icon: Icons.person_2_rounded, text: ''),
             ],
           ),
