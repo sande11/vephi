@@ -171,7 +171,7 @@ class HomePage extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const JobDetails()),
+          MaterialPageRoute(builder: (context) => const JobDetails(title: '', company: '', type: '', level: '', location: '', time: '',)),
         );
       },
       child: Padding(
