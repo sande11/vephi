@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:vephi/pages/account.dart';
-import 'package:vephi/pages/folder.dart';
+import 'package:vephi/pages/tips.dart';
 import 'package:vephi/pages/home.dart';
 import 'package:vephi/pages/tracker.dart';
 
@@ -34,7 +34,7 @@ class _MainScreenState extends State<MainScreen> {
   // List of pages to navigate between
   final List<Widget> _pages = [
     const HomePage(),
-    const Folder(),
+    const Tips(),
     const Tracker(),
     const Account(),
   ];

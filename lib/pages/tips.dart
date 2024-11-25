@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class Folder extends StatelessWidget {
-  const Folder({super.key});
+class Tips extends StatelessWidget {
+  const Tips({super.key});
 
   @override
   Widget build(BuildContext context) {
