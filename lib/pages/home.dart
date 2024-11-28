@@ -97,7 +97,7 @@ class HomePage extends StatelessWidget {
               child: Column(
                 children: [
                   const Padding(
-                    padding: EdgeInsets.only(left: 25.0, right: 25),
+                    padding: EdgeInsets.only(left: 16.0, right: 25),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -135,7 +135,7 @@ class HomePage extends StatelessWidget {
                   ),
                   Container(
                     alignment: Alignment.topLeft,
-                    padding: const EdgeInsets.only(left: 25),
+                    padding: const EdgeInsets.only(left: 16),
                     child: const Text(
                       'All Jobs',
                       style: TextStyle(
@@ -171,7 +171,15 @@ class HomePage extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const JobDetails(title: '', company: '', type: '', level: '', location: '', time: '',)),
+          MaterialPageRoute(
+              builder: (context) => const JobDetails(
+                    title: '',
+                    company: '',
+                    type: '',
+                    level: '',
+                    location: '',
+                    time: '',
+                  )),
         );
       },
       child: Padding(
