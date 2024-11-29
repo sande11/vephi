@@ -24,7 +24,7 @@ class Tracker extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Job Tracker',
+                    'Track your applications',
                     style: TextStyle(
                       color: Color.fromRGBO(27, 27, 27, 1),
                       fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class Tracker extends StatelessWidget {
               child: const TextField(
                 decoration: InputDecoration(
                   contentPadding:
-                      EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                      EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                   hintText: 'Search...',
                   border: InputBorder.none,
                   prefixIcon: Icon(
@@ -236,7 +236,7 @@ class Tracker extends StatelessWidget {
                         style: const TextStyle(color: Colors.white),
                       ),
                       Text(
-                        time,
+                        'Applied: $time',
                         style: const TextStyle(color: Colors.white70),
                       ),
                     ],

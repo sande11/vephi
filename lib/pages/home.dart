@@ -69,7 +69,7 @@ class HomePage extends StatelessWidget {
               child: const TextField(
                 decoration: InputDecoration(
                   contentPadding:
-                      EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                      EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                   hintText: 'Search...',
                   border: InputBorder.none,
                   prefixIcon: Icon(
@@ -265,7 +265,7 @@ class HomePage extends StatelessWidget {
                         style: const TextStyle(color: Colors.white),
                       ),
                       Text(
-                        time,
+                        'Posted: $time',
                         style: const TextStyle(color: Colors.white70),
                       ),
                     ],
