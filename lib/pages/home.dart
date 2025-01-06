@@ -233,7 +233,7 @@ class HomePage extends StatelessWidget {
                       const Icon(
                         Icons.bookmark_border,
                         color: Colors.white,
-                        size: 33,
+                        size: 32,
                       ),
                     ],
                   ),

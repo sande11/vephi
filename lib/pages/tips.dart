@@ -111,8 +111,7 @@ class Tips extends StatelessWidget {
       ),
       body: Column(children: [
         Padding(
-          padding:
-              const EdgeInsets.only(left: 16.0, top: 16, right: 16, bottom: 2),
+          padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
               color: const Color(0xFFF9F9F9),
@@ -121,7 +120,7 @@ class Tips extends StatelessWidget {
             child: const TextField(
               decoration: InputDecoration(
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                    EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                 hintText: 'Search...',
                 border: InputBorder.none,
                 prefixIcon: Icon(
@@ -149,7 +148,7 @@ class Tips extends StatelessWidget {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 8.0, right: 8, top: 8),
+                  padding: const EdgeInsets.only(left: 8.0, right: 8, top: 0),
                   child: Card(
                     elevation: 5,
                     color: const Color(0xFF2D82FF),

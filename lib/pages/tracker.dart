@@ -156,7 +156,7 @@ class Tracker extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8),
         child: SizedBox(
-          height: 162,
+          height: 166,
           width: double.infinity,
           child: Card(
             elevation: 5,
@@ -169,32 +169,45 @@ class Tracker extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const CircleAvatar(
-                        backgroundImage: AssetImage('assets/company_logo.png'),
-                        radius: 20,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
                         children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          const CircleAvatar(
+                            backgroundImage:
+                                AssetImage('assets/company_logo.png'),
+                            radius: 25,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            company,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                company,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const Icon(Icons.delete, color: Colors.white),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 0),
+                        child: Icon(
+                          Icons.delete_outline,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
