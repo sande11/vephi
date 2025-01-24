@@ -59,9 +59,11 @@ class Tips extends StatelessWidget {
     String comments = '5';
 
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: Colors.white,
+        elevation: 4,
+        backgroundColor: Colors.grey[200],
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -132,7 +134,7 @@ class Tips extends StatelessWidget {
                   color: Color(0xFF2D82FF),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 1.0),
+                  borderSide: BorderSide(color: Colors.black, width: 0.3),
                   borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
                 focusedBorder: OutlineInputBorder(

@@ -1,20 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:vephi/pages/sign_up.dart';
+import 'dart:convert';
+import 'sign_in.dart';
 
-class Account extends StatelessWidget {
+class Account extends StatefulWidget {
   const Account({super.key});
 
   @override
+  _AccountState createState() => _AccountState();
+}
+
+class _AccountState extends State<Account> {
+  bool isLoggedIn = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    try {
+      final url = Uri.parse('http://172.26.96.1/vephi/api/check-login-status');
+      final response = await http.get(url, headers: {
+        'Authorization': 'Bearer USER_TOKEN',
+      });
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          isLoggedIn = data['logged_in'] ?? false;
+        });
+
+        if (!isLoggedIn) {
+          // Redirect to SignInPage if not logged in
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const SignInPage()),
+          );
+        }
+      } else {
+        // Handle other status codes if necessary
+        print('Failed to check login status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error checking login status: $e');
+      // Optionally redirect to SignInPage on error
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignUpPage()),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // If not logged in, return an empty container or a loading indicator
+    if (!isLoggedIn) {
+      return Container(); // or a loading indicator
+    }
+
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey[200],
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             const Text(
               'Hello Kelvin',
               style: TextStyle(color: Colors.grey, fontSize: 18),
@@ -32,19 +87,15 @@ class Account extends StatelessWidget {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(
-                        Icons.notifications,
-                        color: Colors.black,
-                      ),
+                      icon:
+                          const Icon(Icons.notifications, color: Colors.black),
                       padding: const EdgeInsets.all(0),
                       constraints: const BoxConstraints(),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: const Icon(
-                        Icons.bookmark_border,
-                        color: Colors.black,
-                      ),
+                      icon: const Icon(Icons.bookmark_border,
+                          color: Colors.black),
                       padding: const EdgeInsets.all(0),
                       constraints: const BoxConstraints(),
                       onPressed: () {},
@@ -60,7 +111,6 @@ class Account extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Card
             buildProfileCard(
               context,
               'assets/profile_pic.png',
@@ -68,8 +118,6 @@ class Account extends StatelessWidget {
               'kelvinsande9@gmail.com',
               'Software Engineer',
             ),
-
-            // Add other sections or widgets below
             buildOptionsCard(context),
           ],
         ),
@@ -138,7 +186,7 @@ class Account extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Card(
         elevation: 2,
-        color: Colors.grey[300], // Light grey background
+        color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -151,7 +199,6 @@ class Account extends StatelessWidget {
                 icon: Icons.bookmark_border,
                 label: 'Saved Jobs',
                 onTap: () {
-                  // Navigate to Saved Jobs
                   Navigator.push(context, MaterialPageRoute(builder: (_) {
                     return const Placeholder(); // Replace with your Saved Jobs screen
                   }));
@@ -163,7 +210,6 @@ class Account extends StatelessWidget {
                 icon: Icons.description_outlined,
                 label: 'Curriculum Vitae',
                 onTap: () {
-                  // Navigate to CV section
                   Navigator.push(context, MaterialPageRoute(builder: (_) {
                     return const Placeholder();
                   }));
@@ -175,7 +221,6 @@ class Account extends StatelessWidget {
                 icon: Icons.notifications_none,
                 label: 'Notifications',
                 onTap: () {
-                  // Navigate to Notifications
                   Navigator.push(context, MaterialPageRoute(builder: (_) {
                     return const Placeholder();
                   }));
@@ -187,7 +232,6 @@ class Account extends StatelessWidget {
                 icon: Icons.settings_outlined,
                 label: 'Preferences',
                 onTap: () {
-                  // Navigate to Preferences
                   Navigator.push(context, MaterialPageRoute(builder: (_) {
                     return const Placeholder();
                   }));
@@ -199,9 +243,9 @@ class Account extends StatelessWidget {
                 icon: Icons.logout,
                 label: 'Logout',
                 onTap: () {
-                  // Navigate to Preferences
-                  Navigator.push(context, MaterialPageRoute(builder: (_) {
-                    return const Placeholder();
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (_) {
+                    return const SignInPage();
                   }));
                 },
               ),
@@ -212,7 +256,6 @@ class Account extends StatelessWidget {
     );
   }
 
-// Helper Widget for Clickable Option
   Widget buildClickableOption(BuildContext context,
       {required IconData icon,
       required String label,
