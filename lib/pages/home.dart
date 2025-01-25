@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vephi/pages/best_fit.dart';
 import 'package:vephi/pages/job_details.dart';
 
 class HomePage extends StatelessWidget {
@@ -9,7 +10,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        toolbarHeight: 80,
+        toolbarHeight: 90,
         elevation: 4,
         backgroundColor: Colors.grey[200],
         title: Column(
@@ -61,49 +62,51 @@ class HomePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9F9F9),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                  hintText: 'Search...',
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Color(0xFF2D82FF),
-                  ),
-                  suffixIcon: Icon(
-                    Icons.filter_list,
-                    color: Color(0xFF2D82FF),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black, width: 0.3),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black, width: 2.0),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                ),
-              ),
-            ),
-          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16.0, right: 25),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9F9F9),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const TextField(
+                        decoration: InputDecoration(
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                          hintText: 'Search...',
+                          border: InputBorder.none,
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Color(0xFF2D82FF),
+                          ),
+                          suffixIcon: Icon(
+                            Icons.filter_list,
+                            color: Color(0xFF2D82FF),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 0.3),
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 2.0),
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, right: 25),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        const Text(
                           'Best Fit',
                           style: TextStyle(
                             color: Color.fromRGBO(27, 27, 27, 1),
@@ -111,11 +114,21 @@ class HomePage extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          'See All',
-                          style: TextStyle(
-                            color: Color.fromRGBO(27, 27, 27, 1),
-                            fontWeight: FontWeight.bold,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const BestFit(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'See All',
+                            style: TextStyle(
+                              color: Color.fromRGBO(27, 27, 27, 1),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],

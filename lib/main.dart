@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vephi/pages/account.dart';
+import 'package:vephi/pages/sign_in.dart';
 import 'package:vephi/pages/tips.dart';
 import 'package:vephi/pages/home.dart';
 import 'package:vephi/pages/tracker.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+  );
   runApp(const MyApp());
 }
 
@@ -36,7 +45,7 @@ class _MainScreenState extends State<MainScreen> {
     const HomePage(),
     const Tips(),
     const Tracker(),
-    const Account(),
+    const SignInPage(),
   ];
 
   // Function to handle tab change
@@ -49,6 +58,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       body: _pages[_selectedIndex], // Display the selected page
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(10.0),

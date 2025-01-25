@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vephi/pages/sign_in.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -8,73 +9,112 @@ class SignUpPage extends StatelessWidget {
     final _formKey = GlobalKey<FormState>();
     final TextEditingController _emailController = TextEditingController();
     final TextEditingController _passwordController = TextEditingController();
-    final TextEditingController _confirmPasswordController = TextEditingController();
+    final TextEditingController _confirmPasswordController =
+        TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  return null;
-                },
+      backgroundColor: Colors.grey[300],
+      body: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          top: 25,
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Center(
+              child: Image.asset(
+                'assets/Logo.png',
+                height: 200.0,
               ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
+            ),
+            const SizedBox(height: 6.0),
+            const Text(
+              'Welcome!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
               ),
-              TextFormField(
-                controller: _confirmPasswordController,
-                decoration: const InputDecoration(labelText: 'Confirm Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please confirm your password';
-                  }
-                  if (value != _passwordController.text) {
-                    return 'Passwords do not match';
-                  }
-                  return null;
-                },
+            ),
+            const SizedBox(height: 0),
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Process data
-                  }
-                },
-                child: const Text('Sign Up'),
+            ),
+            const SizedBox(height: 16.0),
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: () {
-                  // Handle Google sign up
-                },
-                icon: const Icon(Icons.login),
-                label: const Text('Sign Up with Google'),
+              obscureText: true,
+            ),
+            const SizedBox(height: 16.0),
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                border: OutlineInputBorder(),
               ),
-            ],
-          ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () {
+                // Handle sign in
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2D82FF),
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              child: const Text(
+                'Sign Up',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 10.0),
+            ElevatedButton(
+              onPressed: () {
+                // Handle sign in
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                backgroundColor: const Color(0xFF2D82FF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              child: const Text(
+                'Sign Up with Google',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 32.0),
+            GestureDetector(
+              onTap: () {
+                // Navigate to sign in page
+                Navigator.push(context, MaterialPageRoute(builder: (_) {
+                  return const SignInPage();
+                }));
+              },
+              child: const Text(
+                'Already have an account? Sign In',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF2D82FF),
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
