@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vephi/pages/account.dart';
 import 'package:vephi/pages/sign_in.dart';
 import 'package:vephi/pages/tips.dart';
 import 'package:vephi/pages/home.dart';
