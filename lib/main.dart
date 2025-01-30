@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vephi/pages/account.dart';
 import 'package:vephi/pages/sign_in.dart';
 import 'package:vephi/pages/tips.dart';
 import 'package:vephi/pages/home.dart';
@@ -30,35 +31,49 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final int? initialTab;
+  final bool isLoggedIn;
+
+  const MainScreen({Key? key, this.initialTab = 0, this.isLoggedIn = false})
+      : super(key: key);
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+  late bool _isLoggedIn;
 
-  // List of pages to navigate between
-  final List<Widget> _pages = [
-    const HomePage(),
-    const Tips(),
-    const Tracker(),
-    const SignInPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialTab ?? 0;
+    _isLoggedIn = widget.isLoggedIn;
+  }
 
-  // Function to handle tab change
-  void _onTabChange(int index) {
+  void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 4) {
+        _isLoggedIn = true; // Keep account active until logout
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> pages = [
+      const HomePage(),
+      const Tips(),
+      const Tracker(),
+      const SignInPage(),
+      _isLoggedIn ? const Account() : const SignInPage(), // Show Account if logged in
+    ];
+
     return Scaffold(
       backgroundColor: Colors.grey[300],
-      body: _pages[_selectedIndex], // Display the selected page
+      body: pages[_selectedIndex],
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Container(
@@ -68,7 +83,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           child: GNav(
             selectedIndex: _selectedIndex,
-            onTabChange: _onTabChange,
+            onTabChange: _onItemTapped,
             color: Colors.white,
             activeColor: Colors.white,
             tabBackgroundColor: const Color(0xFF2D82FF),

@@ -1,15 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vephi/main.dart';
 import 'package:vephi/pages/account.dart';
 import 'package:vephi/pages/sign_up.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
 
   @override
+  _SignInPageState createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final loggedIn = prefs.getBool('isLoggedIn') ?? false;
+    if (loggedIn) {
+      setState(() {
+        isLoggedIn = true;
+      });
+    }
+  }
+
+  Future<void> _setLoginStatus(bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', status);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
+    if (isLoggedIn) {
+      return const Account();
+    }
 
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -140,14 +173,21 @@ class SignInPage extends StatelessWidget {
         return;
       }
 
-      // Handle successful sign-in
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Signed in as ${response.user!.email}')),
       );
 
+      await _setLoginStatus(true);
+
+      setState(() {
+        isLoggedIn = true;
+      });
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const Account()),
+        MaterialPageRoute(
+          builder: (_) => MainScreen(initialTab: 4, isLoggedIn: true),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

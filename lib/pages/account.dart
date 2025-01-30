@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vephi/pages/complete_profile.dart';
+import 'package:vephi/pages/sign_in.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -9,6 +11,47 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
+  @override
+  void initState() {
+    super.initState();
+    _checkProfileCompletion();
+  }
+
+  Future<void> _checkProfileCompletion() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      final response = await Supabase.instance.client
+          .from('customers')
+          .select('is_completed')
+          .eq('id', user.id)
+          .single();
+
+      final isCompleted = response['is_completed'] as bool? ?? false;
+
+      if (!isCompleted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Redirecting to complete your profile...')),
+        );
+
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const CompleteProfile()),
+            );
+          }
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,12 +201,15 @@ class _AccountState extends State<Account> {
                         context,
                         icon: Icons.logout,
                         label: 'Logout',
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const SignInPage()),
-                          );
+                        onTap: () async {
+                          await Supabase.instance.client.auth.signOut();
+                          if (mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const SignInPage()),
+                            );
+                          }
                         },
                       ),
                     ],
