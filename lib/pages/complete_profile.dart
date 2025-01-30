@@ -12,7 +12,7 @@ class CompleteProfile extends StatelessWidget {
         elevation: 2,
         title: const Text(
           "Complete Profile",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(27, 27, 27, 1)),
         ),
         centerTitle: true,
       ),
