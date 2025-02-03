@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vephi/main.dart';
 
 class CompleteProfile extends StatelessWidget {
   const CompleteProfile({super.key});
@@ -39,8 +41,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
 
   // Work & Education
   List<Map<String, TextEditingController>> _workHistory = [];
-  List<TextEditingController> _professions = [];
-  List<TextEditingController> _educations = [];
+  List<TextEditingController> _profession = [];
+  List<TextEditingController> _education = [];
   List<TextEditingController> _skills = [];
   List<TextEditingController> _jobPreferences = [];
 
@@ -84,8 +86,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                 padding: const EdgeInsets.all(8.0),
                 child: _buildSection(title: 'Work & Education', children: [
                   _buildWorkHistory(),
-                  _buildDynamicField("Profession", _professions),
-                  _buildDynamicField("Education", _educations),
+                  _buildDynamicField("Profession", _profession),
+                  _buildDynamicField("Education", _education),
                   _buildDynamicField("Skills", _skills),
                   _buildDynamicField("Job Preferences", _jobPreferences),
                 ]),
@@ -132,7 +134,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                       borderRadius: BorderRadius.circular(12)),
                   elevation: 3,
                 ),
-                onPressed: _submitForm,
+                onPressed: () => _submitForm(context),
                 child: const Text(
                   'Submit Profile',
                   style: TextStyle(
@@ -324,10 +326,132 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
     );
   }
 
-  void _submitForm() {
+  void _submitForm(BuildContext context) {
     if (_formKey.currentState!.validate()) {
+      // Collect personal information
+      String fullName = _fullNameController.text;
+      String email = _emailController.text;
+      String phone = _phoneController.text;
+      String location = _locationController.text;
+
+      // Collect work history
+      List<Map<String, String>> workHistory = _workHistory.map((work) {
+        return {
+          'Company': work['Company']!.text,
+          'Position': work['Position']!.text,
+          'Years': work['Years']!.text
+        };
+      }).toList();
+
+      // Collect dynamic fields
+      List<String> profession =
+          _profession.map((controller) => controller.text).toList();
+      List<String> education =
+          _education.map((controller) => controller.text).toList();
+      List<String> skills =
+          _skills.map((controller) => controller.text).toList();
+      List<String> jobPreferences =
+          _jobPreferences.map((controller) => controller.text).toList();
+
+      // Collect links & resume
+      String resumePath = _resumePathController.text;
+      String linkedinUrl = _linkedinUrlController.text;
+      String portfolioUrl = _portfolioUrlController.text;
+
+      // Collect bio
+      String bio = _bioController.text;
+
+      // Package all data into a map to send to the backend
+      Map<String, dynamic> profileData = {
+        'full_name': fullName,
+        'email': email,
+        'phone': phone,
+        'location': location,
+        'work_history': workHistory,
+        'profession': profession,
+        'education': education,
+        'skills': skills,
+        'job_preferences': jobPreferences,
+        'resume_path': resumePath,
+        'linkedin_url': linkedinUrl,
+        'portfolio_url': portfolioUrl,
+        'bio': bio,
+      };
+
+      // Call the function to update the profile data
+      _updateProfile(context, profileData);
+
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Profile Updated Successfully! 🎉")));
+          const SnackBar(content: Text("Updating Your Profile......")));
     }
   }
+}
+
+Future<void> _updateProfile(
+    BuildContext context, Map<String, dynamic> profileData) async {
+  final user = Supabase.instance.client.auth.currentUser;
+
+  if (user == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("User is not authenticated.")),
+    );
+    return;
+  }
+
+  try {
+    // Define the table in Supabase (e.g., 'customers')
+    final response = await Supabase.instance.client
+        .from('customers')
+        .upsert({
+          'id': user.id, // Assuming 'id' is the user's identifier in Supabase
+          'full_name': profileData['full_name'],
+          'email': profileData['email'],
+          'phone': profileData['phone'],
+          'location': profileData['location'],
+          'work_history': profileData['work_history'],
+          'profession': profileData['profession'],
+          'education': profileData['education'],
+          'skills': profileData['skills'],
+          'job_preferences': profileData['job_preferences'],
+          'resume_path': profileData['resume_path'],
+          'linkedin_url': profileData['linkedin_url'],
+          'portfolio_url': profileData['portfolio_url'],
+          'bio': profileData['bio'],
+          'is_completed': true,
+        })
+        .eq('id', user.id)
+        .select();
+
+    // Check if the response is successful (there might not be an error property directly in PostgrestList)
+    if (response.error != null) {
+      // Handle any errors that occur during the operation
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${response.error!.message}')),
+      );
+      return;
+    }
+
+    // If the update was successful, show a success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Profile Updated Successfully! 🎉")),
+    );
+
+    // Redirect the user to the Account page
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const MainScreen(initialTab: 4, isLoggedIn: true),
+      ),
+    );
+  } catch (e) {
+    // Handle unexpected errors
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('An unexpected error occurred: $e')),
+    );
+  }
+}
+
+extension on PostgrestList {
+  get error => null;
 }
