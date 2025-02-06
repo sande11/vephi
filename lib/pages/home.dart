@@ -1,9 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vephi/pages/best_fit.dart';
 import 'package:vephi/pages/job_details.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String name = '';
+  String email = '';
+  String profession = '';
+  List<Map<String, dynamic>> jobs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+    _fetchJobs();
+  }
+
+  // Load user data (name, email, profession) from SharedPreferences
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs.getString('full_name') ?? '';
+      email = prefs.getString('email') ?? '';
+      profession = prefs.getString('profession') ?? '';
+    });
+  }
+
+  // Fetch jobs from Supabase 'jobs' table
+  Future<void> _fetchJobs() async {
+    try {
+      final data = await Supabase.instance.client.from('jobs').select('*');
+      setState(() {
+        jobs = List<Map<String, dynamic>>.from(data);
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching jobs: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,12 +59,10 @@ class HomePage extends StatelessWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 20,
-            ),
-            const Text(
-              'Hello Kelvin',
-              style: TextStyle(color: Colors.grey, fontSize: 18),
+            const SizedBox(height: 20),
+            Text(
+              'Hello $name',
+              style: const TextStyle(color: Colors.grey, fontSize: 18),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -36,19 +77,15 @@ class HomePage extends StatelessWidget {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(
-                        Icons.notifications,
-                        color: Colors.black,
-                      ),
+                      icon:
+                          const Icon(Icons.notifications, color: Colors.black),
                       padding: const EdgeInsets.all(0),
                       constraints: const BoxConstraints(),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: const Icon(
-                        Icons.bookmark_border,
-                        color: Colors.black,
-                      ),
+                      icon: const Icon(Icons.bookmark_border,
+                          color: Colors.black),
                       padding: const EdgeInsets.all(0),
                       constraints: const BoxConstraints(),
                       onPressed: () {},
@@ -60,128 +97,159 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Search Field
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9F9F9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                    hintText: 'Search...',
+                    border: InputBorder.none,
+                    prefixIcon: Icon(Icons.search, color: Color(0xFF2D82FF)),
+                    suffixIcon:
+                        Icon(Icons.filter_list, color: Color(0xFF2D82FF)),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black, width: 0.3),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black, width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Best Fit Section Header
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF9F9F9),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const TextField(
-                        decoration: InputDecoration(
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                          hintText: 'Search...',
-                          border: InputBorder.none,
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: Color(0xFF2D82FF),
-                          ),
-                          suffixIcon: Icon(
-                            Icons.filter_list,
-                            color: Color(0xFF2D82FF),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 0.3),
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 2.0),
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                          ),
-                        ),
-                      ),
+                  const Text(
+                    'Best Fit',
+                    style: TextStyle(
+                      color: Color.fromRGBO(27, 27, 27, 1),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16.0, right: 25),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Best Fit',
-                          style: TextStyle(
-                            color: Color.fromRGBO(27, 27, 27, 1),
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const BestFit(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            'See All',
-                            style: TextStyle(
-                              color: Color.fromRGBO(27, 27, 27, 1),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-
-                  // First Job Card
-                  buildJobCard(context, 'Software Engineer', 'Microsoft',
-                      'Full Time', 'Senior Level', 'New York', '20 hours ago'),
-                  const SizedBox(height: 10),
-
-                  // divider
-                  const Padding(
-                    padding: EdgeInsets.only(top: 0, left: 25, right: 25),
-                    child: Divider(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.topLeft,
-                    padding: const EdgeInsets.only(left: 16),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const BestFit()),
+                      );
+                    },
                     child: const Text(
-                      'All Jobs',
+                      'See All',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
                         color: Color.fromRGBO(27, 27, 27, 1),
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 10),
-
-                  // Third Job Card (under "All Jobs")
-                  buildJobCard(context, 'Data Analyst', 'Amazon', 'Full Time',
-                      'Entry Level', 'Seattle', '3 days ago'),
-                  const SizedBox(height: 10),
-
-                  // Fourth Job Card (under "All Jobs")
-                  buildJobCard(context, 'Marketing Specialist', 'Facebook',
-                      'Part Time', 'Senior Level', 'Remote', '1 week ago'),
                 ],
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            // Best Fit: Horizontal Job Cards
+            Container(
+              height: 180,
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: jobs.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: jobs.length,
+                      itemBuilder: (context, index) {
+                        final job = jobs[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: buildJobCard(
+                            context,
+                            job['job_title'] ?? 'No Title',
+                            job['company_name'] ?? 'Unknown Company',
+                            job['type'] ?? '',
+                            job['level'] ?? '',
+                            job['location'] ?? '',
+                            job['time'] ?? '',
+                            job['company_logo'] ?? '',
+                          ),
+                        );
+                      },
+                    ),
+            ),
+            // Divider and All Jobs Section Header
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+              child: Divider(color: Colors.grey),
+            ),
+            Container(
+              alignment: Alignment.topLeft,
+              padding: const EdgeInsets.only(left: 16),
+              child: const Text(
+                'All Jobs',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Color.fromRGBO(27, 27, 27, 1),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // All Jobs: Vertical Job Cards
+            jobs.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: jobs.length,
+                    itemBuilder: (context, index) {
+                      final job = jobs[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 4.0),
+                        child: buildJobCard(
+                          context,
+                          job['job_title'] ?? 'No Title',
+                          job['company_name'] ?? 'Unknown Company',
+                          job['type'] ?? '',
+                          job['level'] ?? '',
+                          job['location'] ?? '',
+                          job['time'] ?? '',
+                          job['company_logo'] ?? '',
+                        ),
+                      );
+                    },
+                  ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget buildJobCard(BuildContext context, String title, String company,
-      String type, String level, String location, String time) {
+  // Build a job card widget with the provided details, including company_logo.
+  Widget buildJobCard(
+      BuildContext context,
+      String title,
+      String company,
+      String type,
+      String level,
+      String location,
+      String time,
+      String companyLogo) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -194,110 +262,112 @@ class HomePage extends StatelessWidget {
               level: '',
               location: '',
               time: '',
+              job: {},
             ),
           ),
         );
       },
-      child: Padding(
-        padding: const EdgeInsets.only(left: 8.0, right: 8),
-        child: SizedBox(
-          height: 166,
-          width: double.infinity,
-          child: Card(
-            elevation: 5,
-            color: const Color(0xFF2D82FF),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const CircleAvatar(
-                            backgroundImage:
-                                AssetImage('assets/company_logo.png'),
-                            radius: 25,
-                          ),
-                          const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                title,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+      child: SizedBox(
+        width: 300,
+        child: Card(
+          elevation: 5,
+          color: const Color(0xFF2D82FF),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: companyLogo.isNotEmpty
+                              ? NetworkImage(companyLogo)
+                              : const AssetImage('assets/Logo.png')
+                                  as ImageProvider,
+                          radius: 25,
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                company,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              company,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const Icon(
-                        Icons.bookmark_border,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 10,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[500],
-                          borderRadius: BorderRadius.circular(5),
+                            ),
+                          ],
                         ),
-                        child: Text(
-                          type,
-                          style: const TextStyle(color: Colors.white),
-                        ),
+                      ],
+                    ),
+                    const Icon(
+                      Icons.bookmark_border,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 10,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[500],
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[500],
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          level,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        location,
+                      child: Text(
+                        type,
                         style: const TextStyle(color: Colors.white),
                       ),
-                      Text(
-                        'Posted: $time',
-                        style: const TextStyle(color: Colors.white70),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[500],
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                      child: Text(
+                        level,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      location,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      'Posted: $time',
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vephi/pages/complete_profile.dart';
 import 'package:vephi/pages/sign_in.dart';
@@ -11,6 +14,10 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
+  String name = '';
+  String email = '';
+  String profession = '';
+
   @override
   void initState() {
     super.initState();
@@ -24,16 +31,33 @@ class _AccountState extends State<Account> {
     try {
       final response = await Supabase.instance.client
           .from('customers')
-          .select('is_completed')
+          .select('is_completed, full_name, email, profession')
           .eq('id', user.id)
           .single();
 
       final isCompleted = response['is_completed'] as bool? ?? false;
 
+      setState(() {
+        name = response['full_name'] as String? ?? '';
+        email = response['email'] as String? ?? '';
+        final professionData = response['profession'];
+        if (professionData is String && professionData.startsWith('[')) {
+          profession = (jsonDecode(professionData) as List<dynamic>).join(', ');
+        } else {
+          profession = professionData.toString();
+        }
+      });
+
+      // Save to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('full_name', name);
+      await prefs.setString('email', email);
+      await prefs.setString('profession', profession);
+
       if (!isCompleted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Redirecting to complete your profile...')),
+              content: Text('Redirecting you to complete your profile...')),
         );
 
         Future.delayed(const Duration(seconds: 2), () {
@@ -63,9 +87,9 @@ class _AccountState extends State<Account> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            const Text(
-              'Hello Kelvin',
-              style: TextStyle(color: Colors.grey, fontSize: 18),
+            Text(
+              'Hello $name',
+              style: const TextStyle(color: Colors.grey, fontSize: 18),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -119,36 +143,36 @@ class _AccountState extends State<Account> {
                         BorderRadius.vertical(top: Radius.circular(10)),
                   ),
                   padding: const EdgeInsets.all(16.0),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      CircleAvatar(
+                      const CircleAvatar(
                         backgroundImage: AssetImage('assets/profile_pic.png'),
                         radius: 40,
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Kelvin Sande',
-                            style: TextStyle(
+                            name,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
-                            'kelvinsande9@gmail.com',
-                            style: TextStyle(
+                            email,
+                            style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 14,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
-                            'Software Engineer',
-                            style: TextStyle(
+                            profession,
+                            style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 14,
                             ),

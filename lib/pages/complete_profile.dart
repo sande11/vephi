@@ -40,11 +40,11 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
   final TextEditingController _locationController = TextEditingController();
 
   // Work & Education
-  List<Map<String, TextEditingController>> _workHistory = [];
-  List<TextEditingController> _profession = [];
-  List<TextEditingController> _education = [];
-  List<TextEditingController> _skills = [];
-  List<TextEditingController> _jobPreferences = [];
+  final List<Map<String, TextEditingController>> _workHistory = [];
+  final List<TextEditingController> _profession = [];
+  final List<TextEditingController> _education = [];
+  final List<TextEditingController> _skills = [];
+  final List<TextEditingController> _jobPreferences = [];
 
   // Links & Resume Controllers
   final TextEditingController _resumePathController = TextEditingController();
@@ -241,7 +241,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
               ),
             ),
           );
-        }).toList(),
+        }),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blueAccent,
@@ -287,7 +287,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
               ),
             ],
           );
-        }).toList(),
+        }),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blueAccent,

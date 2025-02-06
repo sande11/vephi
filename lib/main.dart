@@ -34,8 +34,7 @@ class MainScreen extends StatefulWidget {
   final int? initialTab;
   final bool isLoggedIn;
 
-  const MainScreen({Key? key, this.initialTab = 0, this.isLoggedIn = false})
-      : super(key: key);
+  const MainScreen({super.key, this.initialTab = 0, this.isLoggedIn = false});
 
   @override
   _MainScreenState createState() => _MainScreenState();

@@ -15,7 +15,7 @@ class JobDetails extends StatelessWidget {
     required this.type,
     required this.level,
     required this.location,
-    required this.time,
+    required this.time, required Map<String, dynamic> job,
   });
 
   @override

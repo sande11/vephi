@@ -186,7 +186,7 @@ class _SignInPageState extends State<SignInPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => MainScreen(initialTab: 4, isLoggedIn: true),
+          builder: (_) => const MainScreen(initialTab: 4, isLoggedIn: true),
         ),
       );
     } catch (e) {
