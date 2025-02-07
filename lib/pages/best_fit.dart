@@ -89,7 +89,7 @@ class BestFit extends StatelessWidget {
               type: '',
               level: '',
               location: '',
-              time: '', job: {},
+              time: '', job: {}, companyLogo: '',
             ),
           ),
         );

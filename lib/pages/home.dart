@@ -48,6 +48,25 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+// Helper function to format time difference
+  String _formatTimeDifference(DateTime postedOn, DateTime closingDate) {
+    final now = DateTime.now();
+    if (closingDate.isBefore(now)) {
+      return 'Closed';
+    }
+
+    final difference = now.difference(postedOn);
+    if (difference.inSeconds < 60) {
+      return '${difference.inSeconds} seconds ago';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} minutes ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else {
+      return '${difference.inDays} days ago';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,8 +185,10 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 4),
             // Best Fit: Horizontal Job Cards
             Container(
-              height: 180,
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              height: 166, // Match Best Fit height
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+              ), // Consistent padding
               child: jobs.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
@@ -175,17 +196,20 @@ class _HomePageState extends State<HomePage> {
                       itemCount: jobs.length,
                       itemBuilder: (context, index) {
                         final job = jobs[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        return SizedBox(
+                          width: MediaQuery.of(context).size.width *
+                              0.95, // Match Best Fit width
                           child: buildJobCard(
                             context,
-                            job['job_title'] ?? 'No Title',
+                            job['position'] ?? 'No Title',
                             job['company_name'] ?? 'Unknown Company',
-                            job['type'] ?? '',
+                            job['job_type'] ?? '',
                             job['level'] ?? '',
                             job['location'] ?? '',
-                            job['time'] ?? '',
+                            job['posted_on'] ?? '',
                             job['company_logo'] ?? '',
+                            DateTime.parse(job['closing_date'] ??
+                                DateTime.now().toString()),
                           ),
                         );
                       },
@@ -208,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 4),
             // All Jobs: Vertical Job Cards
             jobs.isEmpty
                 ? const Center(child: CircularProgressIndicator())
@@ -223,13 +247,15 @@ class _HomePageState extends State<HomePage> {
                             horizontal: 8.0, vertical: 4.0),
                         child: buildJobCard(
                           context,
-                          job['job_title'] ?? 'No Title',
+                          job['position'] ?? 'No Title',
                           job['company_name'] ?? 'Unknown Company',
-                          job['type'] ?? '',
+                          job['job_type'] ?? '',
                           job['level'] ?? '',
                           job['location'] ?? '',
-                          job['time'] ?? '',
+                          job['posted_on'] ?? '',
                           job['company_logo'] ?? '',
+                          DateTime.parse(
+                              job['closing_date'] ?? DateTime.now().toString()),
                         ),
                       );
                     },
@@ -249,26 +275,31 @@ class _HomePageState extends State<HomePage> {
       String level,
       String location,
       String time,
-      String companyLogo) {
+      String companyLogo,
+      DateTime closingDate) {
+    final postedOn = DateTime.parse(time);
+    final formattedTime = _formatTimeDifference(postedOn, closingDate);
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const JobDetails(
-              title: '',
-              company: '',
-              type: '',
-              level: '',
-              location: '',
-              time: '',
-              job: {},
+            builder: (context) => JobDetails(
+              title: title,
+              company: company,
+              type: type,
+              level: level,
+              location: location,
+              time: formattedTime,
+              job: const {},
+              companyLogo: companyLogo,
             ),
           ),
         );
       },
       child: SizedBox(
-        width: 300,
+        // width: 500,
         child: Card(
           elevation: 5,
           color: const Color(0xFF2D82FF),
@@ -362,7 +393,7 @@ class _HomePageState extends State<HomePage> {
                       style: const TextStyle(color: Colors.white),
                     ),
                     Text(
-                      'Posted: $time',
+                      'Posted: $formattedTime',
                       style: const TextStyle(color: Colors.white70),
                     ),
                   ],

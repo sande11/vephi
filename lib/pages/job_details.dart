@@ -7,6 +7,7 @@ class JobDetails extends StatelessWidget {
   final String level;
   final String location;
   final String time;
+  final String companyLogo;
 
   const JobDetails({
     super.key,
@@ -15,7 +16,9 @@ class JobDetails extends StatelessWidget {
     required this.type,
     required this.level,
     required this.location,
-    required this.time, required Map<String, dynamic> job,
+    required this.time,
+    required Map<String, dynamic> job,
+    required this.companyLogo,
   });
 
   @override
@@ -92,19 +95,26 @@ class JobDetails extends StatelessWidget {
                                           color: Colors.white, width: 1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Image.asset(
-                                      'lib/assets/logo.png',
-                                      height: 60,
-                                      width: 60,
-                                      fit: BoxFit.cover,
-                                    ),
+                                    child: companyLogo.isNotEmpty
+                                        ? Image.network(
+                                            companyLogo,
+                                            height: 60,
+                                            width: 60,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.asset(
+                                            'assets/Logo.png',
+                                            height: 60,
+                                            width: 60,
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                const Expanded(
+                                Expanded(
                                   child: Text(
-                                    'Lilongwe Waterboard',
-                                    style: TextStyle(
+                                    company,
+                                    style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -114,8 +124,8 @@ class JobDetails extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 20),
-                            const Text('Position: ',
-                                style: TextStyle(
+                            Text('Position: $title',
+                                style: const TextStyle(
                                     fontSize: 18, color: Colors.white)),
                             const SizedBox(height: 10),
                             Text('Level: $level',
