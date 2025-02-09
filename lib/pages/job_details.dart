@@ -7,7 +7,12 @@ class JobDetails extends StatelessWidget {
   final String level;
   final String location;
   final String time;
+  final String aboutCompany;
+  final String aboutPosition;
   final String companyLogo;
+  final List<String> responsibilities;
+  final List<String> qualifications;
+  final String application;
 
   const JobDetails({
     super.key,
@@ -17,8 +22,13 @@ class JobDetails extends StatelessWidget {
     required this.level,
     required this.location,
     required this.time,
+    required this.aboutCompany,
     required Map<String, dynamic> job,
     required this.companyLogo,
+    required this.application,
+    required this.qualifications,
+    required this.responsibilities,
+    required this.aboutPosition,
   });
 
   @override
@@ -72,13 +82,13 @@ class JobDetails extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 300,
+                    height: 190,
                     width: double.infinity,
                     child: Card(
-                      elevation: 4,
+                      elevation: 2,
                       color: const Color(0xFF2D82FF),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -88,66 +98,137 @@ class JobDetails extends StatelessWidget {
                             Row(
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: Colors.white, width: 1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: companyLogo.isNotEmpty
-                                        ? Image.network(
-                                            companyLogo,
-                                            height: 60,
-                                            width: 60,
-                                            fit: BoxFit.cover,
+                                        ? ClipOval(
+                                            child: Image.network(
+                                              companyLogo,
+                                              height: 60,
+                                              width: 60,
+                                              fit: BoxFit.cover,
+                                            ),
                                           )
-                                        : Image.asset(
-                                            'assets/Logo.png',
-                                            height: 60,
-                                            width: 60,
-                                            fit: BoxFit.cover,
+                                        : ClipOval(
+                                            child: Image.asset(
+                                              'assets/Logo.png',
+                                              height: 60,
+                                              width: 60,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                  child: Text(
-                                    company,
-                                    style: const TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        company,
+                                        style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        title,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 20),
-                            Text('Position: $title',
-                                style: const TextStyle(
-                                    fontSize: 18, color: Colors.white)),
-                            const SizedBox(height: 10),
-                            Text('Level: $level',
-                                style: const TextStyle(
-                                    fontSize: 18, color: Colors.white)),
-                            const SizedBox(height: 10),
-                            Text('Location: $location',
-                                style: const TextStyle(
-                                    fontSize: 18, color: Colors.white)),
-                            const SizedBox(height: 10),
-                            Text('Posted: $time',
-                                style: const TextStyle(
-                                    fontSize: 18, color: Colors.white)),
-                            const SizedBox(height: 10),
-                            Text('Deadline: $type',
-                                style: const TextStyle(
-                                    fontSize: 18, color: Colors.white)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    IconText(
+                                      icon: Icons.business_center,
+                                      text: level,
+                                      iconColor: Colors.white,
+                                      textColor: Colors.white,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    IconText(
+                                      icon: Icons.access_time,
+                                      text: time,
+                                      iconColor: Colors.white,
+                                      textColor: Colors.white,
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    IconText(
+                                      icon: Icons.location_on,
+                                      text: location,
+                                      iconColor: Colors.white,
+                                      textColor: Colors.white,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    IconText(
+                                      icon: Icons.calendar_today,
+                                      text: type,
+                                      iconColor: Colors.white,
+                                      textColor: Colors.white,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
+                  // Divider and other content
+                  const Padding(
+                    padding: EdgeInsets.only(top: 0, left: 10, right: 10),
+                    child: Divider(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: Text(
+                      'About $company',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(27, 27, 27, 1),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 10),
+                    child: Text(
+                      aboutCompany,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                        color: Color.fromRGBO(27, 27, 27, 1),
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
                   // Divider and other content
                   const Padding(
                     padding: EdgeInsets.only(top: 0, left: 10, right: 10),
@@ -168,11 +249,11 @@ class JobDetails extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10.0, right: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 10),
                     child: Text(
-                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida quam quis consequat vulputate. Morbi ultrices in sem pretium sagittis. Suspendisse vestibulum orci et felis cursus, at dignissim justo fringilla. Vivamus ipsum sapien, semper quis vestibulum at, faucibus eu lacus. Vestibulum nulla eros, commodo eu scelerisque at, viverra nec nisl. In euismod ac enim sit amet scelerisque. Nullam bibendum vitae augue id facilisis. Nam fermentum ornare rutrum. Praesent quis nulla tortor. Curabitur ut ante risus. Maecenas eget odio id nisi sagittis lacinia at a ex. Mauris malesuada pharetra leo, quis finibus nisl. Praesent lobortis dapibus condimentum',
-                      style: TextStyle(
+                      aboutPosition,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.normal,
                         color: Color.fromRGBO(27, 27, 27, 1),
@@ -201,26 +282,13 @@ class JobDetails extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10.0, right: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        BulletPoint(
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
-                        BulletPoint(
-                            'Etiam gravida quam quis consequat vulputate.'),
-                        BulletPoint('Morbi ultrices in sem pretium sagittis.'),
-                        BulletPoint(
-                            'Suspendisse vestibulum orci et felis cursus.'),
-                        BulletPoint(
-                            'Vivamus ipsum sapien, semper quis vestibulum at.'),
-                        BulletPoint(
-                            'Vestibulum nulla eros, commodo eu scelerisque at, viverra nec nisl.'),
-                        BulletPoint('In euismod ac enim sit amet scelerisque.'),
-                        BulletPoint(
-                            'Nullam bibendum vitae augue id facilisis.'),
-                      ],
+                      children: responsibilities
+                          .map((responsibility) => BulletPoint(responsibility))
+                          .toList(),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -243,26 +311,13 @@ class JobDetails extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10.0, right: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        BulletPoint(
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
-                        BulletPoint(
-                            'Etiam gravida quam quis consequat vulputate.'),
-                        BulletPoint('Morbi ultrices in sem pretium sagittis.'),
-                        BulletPoint(
-                            'Suspendisse vestibulum orci et felis cursus.'),
-                        BulletPoint(
-                            'Vivamus ipsum sapien, semper quis vestibulum at.'),
-                        BulletPoint(
-                            'Vestibulum nulla eros, commodo eu scelerisque at, viverra nec nisl.'),
-                        BulletPoint('In euismod ac enim sit amet scelerisque.'),
-                        BulletPoint(
-                            'Nullam bibendum vitae augue id facilisis.'),
-                      ],
+                      children: qualifications
+                          .map((qualification) => BulletPoint(qualification))
+                          .toList(),
                     ),
                   ),
                 ],
@@ -293,6 +348,37 @@ class JobDetails extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class IconText extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  final Color iconColor;
+
+  const IconText(
+      {super.key,
+      required this.icon,
+      required this.text,
+      required this.iconColor,
+      required Color textColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: iconColor),
+        const SizedBox(width: 5),
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.white70,
+          ),
+        ),
+      ],
     );
   }
 }

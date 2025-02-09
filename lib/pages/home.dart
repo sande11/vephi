@@ -197,8 +197,7 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         final job = jobs[index];
                         return SizedBox(
-                          width: MediaQuery.of(context).size.width *
-                              0.95, // Match Best Fit width
+                          width: MediaQuery.of(context).size.width * 0.95,
                           child: buildJobCard(
                             context,
                             job['position'] ?? 'No Title',
@@ -208,6 +207,11 @@ class _HomePageState extends State<HomePage> {
                             job['location'] ?? '',
                             job['posted_on'] ?? '',
                             job['company_logo'] ?? '',
+                            List<String>.from(job['responsibilities'] ?? []),
+                            List<String>.from(job['qualifications'] ?? []),
+                            job['application'] ?? '',
+                            job['about_company'] ?? '',
+                            job['about_position'] ?? '',
                             DateTime.parse(job['closing_date'] ??
                                 DateTime.now().toString()),
                           ),
@@ -254,6 +258,11 @@ class _HomePageState extends State<HomePage> {
                           job['location'] ?? '',
                           job['posted_on'] ?? '',
                           job['company_logo'] ?? '',
+                          List<String>.from(job['responsibilities'] ?? []),
+                          List<String>.from(job['qualifications'] ?? []),
+                          job['application'] ?? '',
+                          job['about_company'] ?? '',
+                          job['about_position'] ?? '',
                           DateTime.parse(
                               job['closing_date'] ?? DateTime.now().toString()),
                         ),
@@ -276,6 +285,11 @@ class _HomePageState extends State<HomePage> {
       String location,
       String time,
       String companyLogo,
+      List<String> responsibilities,
+      List<String> qualifications,
+      String application,
+      String aboutCompany,
+      String aboutPosition,
       DateTime closingDate) {
     final postedOn = DateTime.parse(time);
     final formattedTime = _formatTimeDifference(postedOn, closingDate);
@@ -292,8 +306,13 @@ class _HomePageState extends State<HomePage> {
               level: level,
               location: location,
               time: formattedTime,
+              aboutCompany: aboutCompany,
+              aboutPosition: aboutPosition,
               job: const {},
               companyLogo: companyLogo,
+              responsibilities: responsibilities,
+              qualifications: qualifications,
+              application: '',
             ),
           ),
         );
