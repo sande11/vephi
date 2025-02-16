@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vephi/pages/best_fit.dart';
 import 'package:vephi/pages/job_details.dart';
+import 'package:vephi/pages/saved_jobs.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   String name = '';
   String email = '';
   String profession = '';
+  String userId = '';
   List<Map<String, dynamic>> jobs = [];
 
   @override
@@ -24,17 +26,18 @@ class _HomePageState extends State<HomePage> {
     _fetchJobs();
   }
 
-  // Load user data (name, email, profession) from SharedPreferences
+  // Load user data
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       name = prefs.getString('full_name') ?? '';
       email = prefs.getString('email') ?? '';
       profession = prefs.getString('profession') ?? '';
+      userId = prefs.getString('id') ?? '';
     });
   }
 
-  // Fetch jobs from Supabase 'jobs' table
+  // Fetch job
   Future<void> _fetchJobs() async {
     try {
       final data = await Supabase.instance.client.from('jobs').select('*');
@@ -48,7 +51,46 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-// Helper function to format time difference
+  Future<void> toggleSavedJob(String jobId) async {
+    final supabase = Supabase.instance.client;
+
+    // Check if job is already saved
+    final existingEntry = await supabase
+        .from('saved_jobs')
+        .select()
+        .eq('customer_id', userId)
+        .eq('job_id', jobId)
+        .single();
+
+    if (existingEntry == null) {
+      // Save job
+      await supabase.from('saved_jobs').insert({
+        'customer_id': userId,
+        'job_id': jobId,
+      });
+    } else {
+      // Unsave job
+      await supabase.from('saved_jobs').delete().match({
+        'customer_id': userId,
+        'job_id': jobId,
+      });
+    }
+  }
+
+  Future<bool> checkIfSaved(String jobId) async {
+    final supabase = Supabase.instance.client;
+
+    final savedJob = await supabase
+        .from('saved_jobs')
+        .select()
+        .eq('customer_id', userId)
+        .eq('job_id', jobId)
+        .single();
+
+    return savedJob != null;
+  }
+
+  // time format
   String _formatTimeDifference(DateTime postedOn, DateTime closingDate) {
     final now = DateTime.now();
     if (closingDate.isBefore(now)) {
@@ -67,6 +109,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // main
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,12 +146,18 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: const Icon(Icons.bookmark_border,
-                          color: Colors.black),
-                      padding: const EdgeInsets.all(0),
-                      constraints: const BoxConstraints(),
-                      onPressed: () {},
-                    ),
+                        icon: const Icon(Icons.bookmark_border,
+                            color: Colors.black),
+                        padding: const EdgeInsets.all(0),
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    SavedJobsPage(userId: userId),
+                              ));
+                        })
                   ],
                 ),
               ],
@@ -183,12 +232,12 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 4),
-            // Best Fit: Horizontal Job Cards
+            // Best Fit Cards
             Container(
-              height: 166, // Match Best Fit height
+              height: 166,
               padding: const EdgeInsets.symmetric(
                 horizontal: 8.0,
-              ), // Consistent padding
+              ),
               child: jobs.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
@@ -200,6 +249,7 @@ class _HomePageState extends State<HomePage> {
                           width: MediaQuery.of(context).size.width * 0.95,
                           child: buildJobCard(
                             context,
+                            job['id'],
                             job['position'] ?? 'No Title',
                             job['company_name'] ?? 'Unknown Company',
                             job['job_type'] ?? '',
@@ -219,7 +269,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
             ),
-            // Divider and All Jobs Section Header
+            // Divider
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
               child: Divider(color: Colors.grey),
@@ -237,7 +287,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 4),
-            // All Jobs: Vertical Job Cards
+            // All Jobs Cards
             jobs.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
@@ -251,6 +301,7 @@ class _HomePageState extends State<HomePage> {
                             horizontal: 8.0, vertical: 4.0),
                         child: buildJobCard(
                           context,
+                          job['id'],
                           job['position'] ?? 'No Title',
                           job['company_name'] ?? 'Unknown Company',
                           job['job_type'] ?? '',
@@ -275,9 +326,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Build a job card widget with the provided details, including company_logo.
+  //job card
   Widget buildJobCard(
       BuildContext context,
+      String jobId,
       String title,
       String company,
       String type,
@@ -318,7 +370,6 @@ class _HomePageState extends State<HomePage> {
         );
       },
       child: SizedBox(
-        // width: 500,
         child: Card(
           elevation: 5,
           color: const Color(0xFF2D82FF),
@@ -366,10 +417,26 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    const Icon(
-                      Icons.bookmark_border,
-                      color: Colors.white,
-                      size: 32,
+                    FutureBuilder<bool>(
+                      future: checkIfSaved(jobId),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
+                        final isSaved = snapshot.data ?? false;
+                        return IconButton(
+                          icon: Icon(
+                            isSaved ? Icons.bookmark : Icons.bookmark_border,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                          onPressed: () async {
+                            await toggleSavedJob(jobId);
+                            setState(() {});
+                          },
+                        );
+                      },
                     ),
                   ],
                 ),

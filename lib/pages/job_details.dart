@@ -58,7 +58,7 @@ class JobDetails extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () {
-              // Add share functionality here
+              
             },
           ),
           IconButton(
@@ -67,7 +67,7 @@ class JobDetails extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () {
-              // Add save functionality here
+          
             },
           ),
         ],
