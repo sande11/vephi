@@ -3,10 +3,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vephi/pages/account.dart';
-import 'package:vephi/pages/sign_in.dart';
+import 'package:vephi/pages/onboarding/complete_profile.dart';
+import 'package:vephi/pages/onboarding/sign_in.dart';
 import 'package:vephi/pages/tips.dart';
 import 'package:vephi/pages/home.dart';
 import 'package:vephi/pages/tracker.dart';
+import 'package:vephi/pages/splash_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainScreen(),
+      home: SplashScreen(),
     );
   }
 }
@@ -98,5 +101,31 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+}
+
+Future<Widget> _getInitialRoute() async {
+  final user = Supabase.instance.client.auth.currentUser;
+  if (user == null) {
+    return const SignInPage();
+  }
+
+  try {
+    final response = await Supabase.instance.client
+        .from('customers')
+        .select('is_completed')
+        .eq('customer_id', user.id)
+        .single();
+
+    final isCompleted = response['is_completed'] as bool? ?? false;
+    
+    if (!isCompleted) {
+      return const CompleteProfile();
+    }
+    
+    return const MainScreen(initialTab: 4, isLoggedIn: true);
+  } catch (e) {
+    // If there's an error, assume profile is not completed
+    return const CompleteProfile();
   }
 }

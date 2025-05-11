@@ -62,19 +62,11 @@ class _HomePageState extends State<HomePage> {
         .eq('job_id', jobId)
         .single();
 
-    if (existingEntry == null) {
-      // Save job
-      await supabase.from('saved_jobs').insert({
-        'customer_id': userId,
-        'job_id': jobId,
-      });
-    } else {
-      // Unsave job
-      await supabase.from('saved_jobs').delete().match({
-        'customer_id': userId,
-        'job_id': jobId,
-      });
-    }
+    // Unsave job
+    await supabase.from('saved_jobs').delete().match({
+      'customer_id': userId,
+      'job_id': jobId,
+    });
   }
 
   Future<bool> checkIfSaved(String jobId) async {
@@ -249,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                           width: MediaQuery.of(context).size.width * 0.95,
                           child: buildJobCard(
                             context,
-                            job['id'],
+                            job['job_id'],
                             job['position'] ?? 'No Title',
                             job['company_name'] ?? 'Unknown Company',
                             job['job_type'] ?? '',
@@ -301,7 +293,7 @@ class _HomePageState extends State<HomePage> {
                             horizontal: 8.0, vertical: 4.0),
                         child: buildJobCard(
                           context,
-                          job['id'],
+                          job['job_id'],
                           job['position'] ?? 'No Title',
                           job['company_name'] ?? 'Unknown Company',
                           job['job_type'] ?? '',

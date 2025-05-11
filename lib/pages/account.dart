@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vephi/pages/complete_profile.dart';
-import 'package:vephi/pages/sign_in.dart';
+import 'package:vephi/pages/onboarding/complete_profile.dart';
+import 'package:vephi/pages/onboarding/sign_in.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -21,21 +21,19 @@ class _AccountState extends State<Account> {
   @override
   void initState() {
     super.initState();
-    _checkProfileCompletion();
+    _loadUserData();
   }
 
-  Future<void> _checkProfileCompletion() async {
+  Future<void> _loadUserData() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
     try {
       final response = await Supabase.instance.client
           .from('customers')
-          .select('is_completed, full_name, email, profession')
-          .eq('id', user.id)
+          .select('full_name, email, profession')
+          .eq('customer_id', user.id)
           .single();
-
-      final isCompleted = response['is_completed'] as bool? ?? false;
 
       setState(() {
         name = response['full_name'] as String? ?? '';
@@ -53,22 +51,6 @@ class _AccountState extends State<Account> {
       await prefs.setString('full_name', name);
       await prefs.setString('email', email);
       await prefs.setString('profession', profession);
-
-      if (!isCompleted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Redirecting you to complete your profile...')),
-        );
-
-        Future.delayed(const Duration(seconds: 2), () {
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const CompleteProfile()),
-            );
-          }
-        });
-      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
