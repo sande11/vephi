@@ -482,10 +482,6 @@ class _HomePageState extends State<HomePage> {
                     FutureBuilder<bool>(
                       future: checkIfSaved(jobId),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        }
                         final isSaved = snapshot.data ?? false;
                         return IconButton(
                           icon: Icon(
