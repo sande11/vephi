@@ -26,15 +26,21 @@ class _AccountState extends State<Account> {
 
   Future<void> _loadUserData() async {
     final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-
+    final prefs = await SharedPreferences.getInstance();
+    if (user == null) {
+      setState(() {
+        name = prefs.getString('full_name') ?? '';
+        email = prefs.getString('email') ?? '';
+        profession = prefs.getString('profession') ?? '';
+      });
+      return;
+    }
     try {
       final response = await Supabase.instance.client
           .from('customers')
           .select('full_name, email, profession')
           .eq('customer_id', user.id)
           .single();
-
       setState(() {
         name = response['full_name'] as String? ?? '';
         email = response['email'] as String? ?? '';
@@ -42,18 +48,21 @@ class _AccountState extends State<Account> {
         if (professionData is String && professionData.startsWith('[')) {
           profession = (jsonDecode(professionData) as List<dynamic>).join(', ');
         } else {
-          profession = professionData.toString();
+          profession = professionData?.toString() ?? '';
         }
       });
-
-      // Save to SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setString('full_name', name);
       await prefs.setString('email', email);
       await prefs.setString('profession', profession);
     } catch (e) {
+      // fallback to SharedPreferences
+      setState(() {
+        name = prefs.getString('full_name') ?? '';
+        email = prefs.getString('email') ?? '';
+        profession = prefs.getString('profession') ?? '';
+      });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('Error loading user: $e')),
       );
     }
   }
@@ -164,7 +173,6 @@ class _AccountState extends State<Account> {
                     ],
                   ),
                 ),
-
                 // Body section (White)
                 Container(
                   padding: const EdgeInsets.all(16.0),
@@ -174,7 +182,23 @@ class _AccountState extends State<Account> {
                         BorderRadius.vertical(bottom: Radius.circular(10)),
                   ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // ListTile(
+                      //   leading: const Icon(Icons.person),
+                      //   title: const Text('Full Name'),
+                      //   subtitle: Text(name),
+                      // ),
+                      // ListTile(
+                      //   leading: const Icon(Icons.email),
+                      //   title: const Text('Email'),
+                      //   subtitle: Text(email),
+                      // ),
+                      // ListTile(
+                      //   leading: const Icon(Icons.work),
+                      //   title: const Text('Profession'),
+                      //   subtitle: Text(profession),
+                      // )
                       buildClickableOption(
                         context,
                         icon: Icons.bookmark_border,
@@ -208,12 +232,15 @@ class _AccountState extends State<Account> {
                         icon: Icons.logout,
                         label: 'Logout',
                         onTap: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.clear();
                           await Supabase.instance.client.auth.signOut();
                           if (mounted) {
-                            Navigator.pushReplacement(
+                            Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
                                   builder: (_) => const SignInPage()),
+                              (route) => false,
                             );
                           }
                         },

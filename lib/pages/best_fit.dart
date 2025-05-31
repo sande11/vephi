@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:vephi/pages/job_details.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BestFit extends StatelessWidget {
   const BestFit({super.key});
+
+  Future<String> _getUserName() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString('full_name') ?? '';
+    }
+    final response = await Supabase.instance.client
+        .from('customers')
+        .select('full_name')
+        .eq('customer_id', user.id)
+        .single();
+    return response['full_name'] ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,13 +28,18 @@ class BestFit extends StatelessWidget {
         toolbarHeight: 80,
         elevation: 4,
         backgroundColor: Colors.grey[200],
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        title: FutureBuilder<String>(
+          future: _getUserName(),
+          builder: (context, snapshot) {
+            final name = snapshot.data ?? '';
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
+                  'Hello $name',
+                  style: const TextStyle(color: Colors.grey, fontSize: 18),
+                ),
+                const Text(
                   'Jobs that suit you',
                   style: TextStyle(
                     color: Color.fromRGBO(27, 27, 27, 1),
@@ -26,8 +47,8 @@ class BestFit extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ],
+            );
+          },
         ),
       ),
       body: Column(

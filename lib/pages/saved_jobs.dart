@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vephi/pages/job_details.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SavedJobsPage extends StatefulWidget {
   final String userId;
@@ -21,12 +22,17 @@ class _SavedJobsPageState extends State<SavedJobsPage> {
   }
 
   Future<void> _fetchSavedJobs() async {
+    String? currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    if (currentUserId == null) {
+      final prefs = await SharedPreferences.getInstance();
+      currentUserId = prefs.getString('id');
+    }
+    if (currentUserId == null) return;
     try {
       final response = await Supabase.instance.client
           .from('saved_jobs')
           .select('jobs(*)')
-          .eq('user_id', widget.userId);
-
+          .eq('customer_id', currentUserId);
       setState(() {
         savedJobs = List<Map<String, dynamic>>.from(response);
       });
@@ -41,7 +47,25 @@ class _SavedJobsPageState extends State<SavedJobsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Saved Jobs'),
+        title: FutureBuilder<String>(
+          future: _getUserName(),
+          builder: (context, snapshot) {
+            final name = snapshot.data ?? '';
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hello $name',
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                const Text(
+                  'Saved Jobs',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ],
+            );
+          },
+        ),
         backgroundColor: const Color(0xFF2D82FF),
       ),
       body: savedJobs.isEmpty
@@ -78,5 +102,19 @@ class _SavedJobsPageState extends State<SavedJobsPage> {
               },
             ),
     );
+  }
+
+  Future<String> _getUserName() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString('full_name') ?? '';
+    }
+    final response = await Supabase.instance.client
+        .from('customers')
+        .select('full_name')
+        .eq('customer_id', user.id)
+        .single();
+    return response['full_name'] ?? '';
   }
 }

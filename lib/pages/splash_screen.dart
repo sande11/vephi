@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vephi/pages/onboarding/intro.dart';
+import 'package:vephi/pages/onboarding/sign_in.dart';
 import 'package:vephi/main.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
@@ -18,41 +18,33 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthAndNavigate() async {
-    // Wait for 2 seconds to show splash screen
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2)); // Show splash for 2 seconds
     
     if (!mounted) return;
 
-    // Check if user is already signed in
-    final session = Supabase.instance.client.auth.currentSession;
-    
-    if (session != null) {
-      // User is signed in, navigate to MainScreen
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const MainScreen(isLoggedIn: true),
-        ),
+        MaterialPageRoute(builder: (_) => const SignInPage()),
       );
-    } else {
-      // User is not signed in, navigate to Intro screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const IntroScreen()),
-      );
+      return;
     }
+
+    // If user is logged in, go straight to HomePage
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const MainScreen(initialTab: 0, isLoggedIn: true),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return const Scaffold(
       body: Center(
-        child: Image.asset(
-          'assets/Logo.png',
-          width: 200,
-          height: 200,
-        ),
+        child: Image(image: AssetImage('assets/Logo.png')),
       ),
     );
   }

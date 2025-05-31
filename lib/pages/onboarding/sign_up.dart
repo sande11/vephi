@@ -310,15 +310,17 @@ class _SignUpPageState extends State<SignUpPage> {
 
                 // Sign Up Button
                 ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    await signUpWithEmail();
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  },
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await signUpWithEmail();
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2D82FF),
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -327,8 +329,13 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            strokeWidth: 2.5,
+                          ),
                         )
                       : const Text(
                           'Sign Up',

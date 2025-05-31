@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JobTracker extends StatelessWidget {
   final String title;
@@ -22,9 +24,24 @@ class JobTracker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Job Details',
-          style: TextStyle(color: Colors.white),
+        title: FutureBuilder<String>(
+          future: _getUserName(),
+          builder: (context, snapshot) {
+            final name = snapshot.data ?? '';
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hello $name',
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                const Text(
+                  'Job Details',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ],
+            );
+          },
         ),
         backgroundColor: const Color(0xFF2D82FF),
         centerTitle: true,
@@ -284,6 +301,20 @@ class JobTracker extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<String> _getUserName() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString('full_name') ?? '';
+    }
+    final response = await Supabase.instance.client
+        .from('customers')
+        .select('full_name')
+        .eq('customer_id', user.id)
+        .single();
+    return response['full_name'] ?? '';
   }
 }
 

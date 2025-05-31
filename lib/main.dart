@@ -69,8 +69,7 @@ class _MainScreenState extends State<MainScreen> {
       const HomePage(),
       const Tips(),
       const Tracker(),
-      const SignInPage(),
-      _isLoggedIn ? const Account() : const SignInPage(), // Show Account if logged in
+      const Account(), // Show Account if logged in
     ];
 
     return Scaffold(

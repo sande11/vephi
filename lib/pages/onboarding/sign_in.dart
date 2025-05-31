@@ -16,6 +16,7 @@ class _SignInPageState extends State<SignInPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool isLoggedIn = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -121,20 +122,27 @@ class _SignInPageState extends State<SignInPage> {
               ),
               const SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: () async {
-                  final email = emailController.text.trim();
-                  final password = passwordController.text.trim();
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        final email = emailController.text.trim();
+                        final password = passwordController.text.trim();
 
-                  if (email.isEmpty || password.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Please enter both email and password')),
-                    );
-                    return;
-                  }
-
-                  await signIn(context, email, password);
-                },
+                        if (email.isEmpty || password.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Please enter both email and password')),
+                          );
+                          return;
+                        }
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        await signIn(context, email, password);
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2D82FF),
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -142,10 +150,19 @@ class _SignInPageState extends State<SignInPage> {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
-                child: const Text(
-                  'Sign In',
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          strokeWidth: 2.5,
+                        ),
+                      )
+                    : const Text(
+                        'Sign In',
+                        style: TextStyle(color: Colors.white),
+                      ),
               ),
               const SizedBox(height: 10.0),
               ElevatedButton(

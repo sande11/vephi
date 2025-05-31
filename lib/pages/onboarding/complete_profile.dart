@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vephi/main.dart';
 import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class CompleteProfile extends StatelessWidget {
   const CompleteProfile({super.key});
@@ -42,7 +44,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
   final TextEditingController _resumePathController = TextEditingController();
   final TextEditingController _linkedinUrlController = TextEditingController();
   final TextEditingController _portfolioUrlController = TextEditingController();
-  final TextEditingController _bioController = TextEditingController();
 
   // Add these variables to your state class
   final List<String> _certificates = [];
@@ -222,7 +223,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
         children: [
           _buildSection(
             title: 'Links & Bio',
-            subtitle: 'Add your professional links and bio',
+            subtitle: 'Add your professional links',
             children: [
               _buildResumeUpload(),
               const SizedBox(height: 16),
@@ -239,8 +240,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                 Icons.link,
                 keyboardType: TextInputType.url,
               ),
-              const SizedBox(height: 16),
-              _buildBioField(),
             ],
           ),
           const SizedBox(height: 24),
@@ -410,42 +409,34 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           ElevatedButton(
             onPressed: _isLoading
                 ? null
-                : () {
-                    if (isLastPage) {
-                      _submitForm(context);
-                    } else {
-                      setState(() {
-                        _currentStep++;
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      });
-                    }
+                : () async {
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    _submitForm(context);
+                    setState(() {
+                      _isLoading = false;
+                    });
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              backgroundColor: const Color(0xFF2D82FF),
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8.0),
               ),
             ),
             child: _isLoading
                 ? const SizedBox(
-                    width: 20,
-                    height: 20,
+                    width: 24,
+                    height: 24,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      strokeWidth: 2.5,
                     ),
                   )
-                : Text(
-                    isLastPage ? 'Complete Profile' : 'Next',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                : const Text(
+                    'Complete Profile',
+                    style: TextStyle(color: Colors.white),
                   ),
           ),
         ],
@@ -625,6 +616,13 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
     );
   }
 
+  Future<String> _saveFileLocally(File file) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
+    final savedFile = await file.copy('${directory.path}/$fileName');
+    return savedFile.path;
+  }
+
   Widget _buildFileUpload(String label, List<String> files, String addButtonText) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -671,8 +669,10 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             );
             
             if (result != null) {
+              final file = File(result.files.single.path!);
+              final savedPath = await _saveFileLocally(file);
               setState(() {
-                files.add(result.files.single.path!);
+                files.add(savedPath);
               });
             }
           },
@@ -725,8 +725,10 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             );
             
             if (result != null) {
+              final file = File(result.files.single.path!);
+              final savedPath = await _saveFileLocally(file);
               setState(() {
-                _resumePath = result.files.single.path!;
+                _resumePath = savedPath;
               });
             }
           },
@@ -735,16 +737,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
     );
   }
 
-  Widget _buildBioField() {
-    // Implementation of _buildBioField method
-    return Container(); // Placeholder, actual implementation needed
-  }
-
   void _submitForm(BuildContext context) {
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
       // Collect personal information
       String fullName = _fullNameController.text;
@@ -772,9 +765,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
       String linkedinUrl = _linkedinUrlController.text;
       String portfolioUrl = _portfolioUrlController.text;
 
-      // Collect bio
-      String bio = _bioController.text;
-
       // Package all data into a map to send to the backend
       Map<String, dynamic> profileData = {
         'full_name': fullName,
@@ -789,7 +779,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
         'resume_path': resumePath,
         'linkedin_url': linkedinUrl,
         'portfolio_url': portfolioUrl,
-        'bio': bio,
         'is_completed': true,
         'updated_at': DateTime.now().toIso8601String(),
       };
@@ -797,9 +786,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
       // Call the function to update the profile data
       _updateProfile(context, profileData);
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${e.toString()}'),
@@ -813,9 +799,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
     final user = Supabase.instance.client.auth.currentUser;
 
     if (user == null) {
-      setState(() {
-        _isLoading = false;
-      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("User is not authenticated."),
@@ -850,11 +833,10 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             'education': profileData['education'],
             'skills': profileData['skills'],
             'job_preferences': profileData['job_preferences'],
-            'certificates': profileData['certificates'],
-            'resume_path': profileData['resume_path'],
+            'certificates': _certificates,
+            'resume_path': _resumePath,
             'linkedin_url': profileData['linkedin_url'],
             'portfolio_url': profileData['portfolio_url'],
-            'bio': profileData['bio'],
             'is_completed': true,
             'updated_at': DateTime.now().toIso8601String(),
           })
@@ -865,24 +847,17 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
         throw response.error!;
       }
 
-      setState(() {
-        _isLoading = false;
-      });
-
-      // Navigate to the main screen and clear the navigation stack
+      // Navigate to HomePage and clear navigation stack
       if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (_) => const MainScreen(initialTab: 4, isLoggedIn: true),
+            builder: (_) => const MainScreen(initialTab: 0, isLoggedIn: true),
           ),
-          (route) => false, // This removes all previous routes
+          (route) => false,
         );
       }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error updating profile: ${e.toString()}'),
