@@ -13,11 +13,22 @@ import 'package:vephi/pages/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load();
+  
+  // Load environment variables
+  try {
+    await dotenv.load(fileName: ".env");
+    print('Environment variables loaded successfully');
+    print('API Key exists: ${dotenv.env['DEEPSEEK_API_KEY'] != null}');
+  } catch (e) {
+    print('Error loading .env file: $e');
+  }
+  
+  // Initialize Supabase
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
+  
   runApp(const MyApp());
 }
 

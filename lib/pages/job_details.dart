@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vephi/services/deepseek_service.dart';
 
 class JobDetails extends StatelessWidget {
   final String title;
@@ -30,6 +32,20 @@ class JobDetails extends StatelessWidget {
     required this.responsibilities,
     required this.aboutPosition,
   });
+
+  Future<void> _showCoverLetterModal(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CoverLetterModal(
+        jobTitle: title,
+        company: company,
+        jobDescription: aboutPosition,
+        requirements: qualifications,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -292,19 +308,22 @@ class JobDetails extends StatelessWidget {
             bottom: 16,
             left: 20,
             right: 20,
-            child: Container(
-              height: 60,
-              decoration: BoxDecoration(
-                color: const Color(0xFF2D82FF),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Center(
-                child: Text(
-                  'Apply Now',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            child: GestureDetector(
+              onTap: () => _showCoverLetterModal(context),
+              child: Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2D82FF),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Apply Now',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -376,5 +395,251 @@ class BulletPoint extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class CoverLetterModal extends StatefulWidget {
+  final String jobTitle;
+  final String company;
+  final String jobDescription;
+  final List<String> requirements;
+
+  const CoverLetterModal({
+    super.key,
+    required this.jobTitle,
+    required this.company,
+    required this.jobDescription,
+    required this.requirements,
+  });
+
+  @override
+  State<CoverLetterModal> createState() => _CoverLetterModalState();
+}
+
+class _CoverLetterModalState extends State<CoverLetterModal> {
+  final TextEditingController _coverLetterController = TextEditingController();
+  bool _isGenerating = false;
+  bool _isEditing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _generateCoverLetter();
+  }
+
+  Future<void> _generateCoverLetter() async {
+    setState(() {
+      _isGenerating = true;
+    });
+
+    try {
+      // Get user profile data from Supabase
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+
+      print('Fetching user profile data...');
+      final response = await Supabase.instance.client
+          .from('customers')
+          .select()
+          .eq('customer_id', user.id)
+          .single();
+
+      if (response == null) {
+        throw Exception('User profile not found');
+      }
+
+      print('User profile data fetched successfully');
+
+      // Prepare the prompt for DeepSeek
+      final prompt = '''
+Generate a professional cover letter for the following job:
+
+Job Title: ${widget.jobTitle}
+Company: ${widget.company}
+Job Description: ${widget.jobDescription}
+Requirements: ${widget.requirements.join(', ')}
+
+Candidate Information:
+Name: ${response['full_name']}
+Experience: ${response['work_history']}
+Skills: ${response['skills'].join(', ')}
+Education: ${response['education'].join(', ')}
+
+Please write a compelling cover letter that highlights the candidate's relevant experience and skills for this position.
+''';
+
+      print('Sending prompt to DeepSeek...');
+      // Call DeepSeek API
+      final coverLetter = await DeepSeekService.generateCoverLetter(prompt);
+      print('Cover letter generated successfully');
+      
+      setState(() {
+        _coverLetterController.text = coverLetter;
+        _isGenerating = false;
+      });
+    } catch (e) {
+      print('Error generating cover letter: $e');
+      setState(() {
+        _isGenerating = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Retry',
+              onPressed: _generateCoverLetter,
+              textColor: Colors.white,
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.9,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, -1),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Cover Letter',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Row(
+                  children: [
+                    if (!_isEditing)
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          setState(() {
+                            _isEditing = true;
+                          });
+                        },
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: _isGenerating ? null : _generateCoverLetter,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _isGenerating
+                ? const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text('Generating your cover letter...'),
+                      ],
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: TextField(
+                      controller: _coverLetterController,
+                      maxLines: null,
+                      expands: true,
+                      readOnly: !_isEditing,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        hintText: 'Your cover letter will appear here...',
+                      ),
+                    ),
+                  ),
+          ),
+          if (_isEditing)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 3,
+                    offset: const Offset(0, -1),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _isEditing = false;
+                      });
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      // TODO: Save the edited cover letter
+                      setState(() {
+                        _isEditing = false;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2D82FF),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text(
+                      'Save Changes',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _coverLetterController.dispose();
+    super.dispose();
   }
 }
