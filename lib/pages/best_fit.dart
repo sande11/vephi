@@ -25,31 +25,23 @@ class BestFit extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        toolbarHeight: 80,
-        elevation: 4,
-        backgroundColor: Colors.grey[200],
-        title: FutureBuilder<String>(
-          future: _getUserName(),
-          builder: (context, snapshot) {
-            final name = snapshot.data ?? '';
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hello $name',
-                  style: const TextStyle(color: Colors.grey, fontSize: 18),
-                ),
-                const Text(
-                  'Jobs that suit you',
-                  style: TextStyle(
-                    color: Color.fromRGBO(27, 27, 27, 1),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+        title: const Text(
+            'Job That Suit You',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color(0xFF2D82FF),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.white,
+              size: 30,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+
       ),
       body: Column(
         children: [

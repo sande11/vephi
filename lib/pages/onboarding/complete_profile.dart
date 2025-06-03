@@ -114,7 +114,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
         key: _formKey,
         child: Column(
           children: [
-            _buildProfilePicture(),
+            // _buildProfilePicture(),
             const SizedBox(height: 24),
             _buildSection(
               title: 'Personal Information',
@@ -248,55 +248,55 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
     );
   }
 
-  Widget _buildProfilePicture() {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: const CircleAvatar(
-            radius: 60,
-            backgroundColor: Colors.grey,
-            child: Icon(Icons.person, size: 60, color: Colors.white),
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          right: 0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.blueAccent,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blueAccent.withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.camera_alt, color: Colors.white),
-              onPressed: () {
-                // Implement image picker
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildProfilePicture() {
+  //   return Stack(
+  //     alignment: Alignment.center,
+  //     children: [
+  //       Container(
+  //         decoration: BoxDecoration(
+  //           shape: BoxShape.circle,
+  //           boxShadow: [
+  //             BoxShadow(
+  //               color: Colors.grey.withOpacity(0.3),
+  //               spreadRadius: 2,
+  //               blurRadius: 5,
+  //               offset: const Offset(0, 3),
+  //             ),
+  //           ],
+  //         ),
+  //         child: const CircleAvatar(
+  //           radius: 60,
+  //           backgroundColor: Colors.grey,
+  //           child: Icon(Icons.person, size: 60, color: Colors.white),
+  //         ),
+  //       ),
+  //       Positioned(
+  //         bottom: 0,
+  //         right: 0,
+  //         child: Container(
+  //           decoration: BoxDecoration(
+  //             color: Colors.blueAccent,
+  //             shape: BoxShape.circle,
+  //             boxShadow: [
+  //               BoxShadow(
+  //                 color: Colors.blueAccent.withOpacity(0.3),
+  //                 spreadRadius: 2,
+  //                 blurRadius: 5,
+  //                 offset: const Offset(0, 2),
+  //               ),
+  //             ],
+  //           ),
+  //           child: IconButton(
+  //             icon: const Icon(Icons.camera_alt, color: Colors.white),
+  //             onPressed: () {
+  //               // Implement image picker
+  //             },
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildSection({
     required String title,
@@ -410,17 +410,27 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             onPressed: _isLoading
                 ? null
                 : () async {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    _submitForm(context);
-                    setState(() {
-                      _isLoading = false;
-                    });
+                    if (isLastPage) {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      await _submitForm(context);
+                      setState(() {
+                        _isLoading = false;
+                      });
+                    } else {
+                      setState(() {
+                        _currentStep++;
+                        _pageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      });
+                    }
                   },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF2D82FF),
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
               ),
@@ -434,9 +444,9 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                       strokeWidth: 2.5,
                     ),
                   )
-                : const Text(
-                    'Complete Profile',
-                    style: TextStyle(color: Colors.white),
+                : Text(
+                    isLastPage ? 'Complete Profile' : 'Next',
+                    style: const TextStyle(color: Colors.white),
                   ),
           ),
         ],
@@ -737,7 +747,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
     );
   }
 
-  void _submitForm(BuildContext context) {
+  Future<void> _submitForm(BuildContext context) async {
     try {
       // Collect personal information
       String fullName = _fullNameController.text;
@@ -784,7 +794,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
       };
 
       // Call the function to update the profile data
-      _updateProfile(context, profileData);
+      await _updateProfile(context, profileData);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -75,15 +75,13 @@ class JobDetails extends StatelessWidget {
       body: Stack(
         children: [
           Padding(
-            padding:
-                const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 80),
+            padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 80),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     height: 190,
-                    width: double.infinity,
                     child: Card(
                       elevation: 2,
                       color: const Color(0xFF2D82FF),
@@ -96,12 +94,13 @@ class JobDetails extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
                                   child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                                    height: 60,
+                                    width: 60,
                                     child: companyLogo.isNotEmpty
                                         ? ClipOval(
                                             child: Image.network(
@@ -124,8 +123,7 @@ class JobDetails extends StatelessWidget {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         company,
@@ -152,41 +150,45 @@ class JobDetails extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    IconText(
-                                      icon: Icons.business_center,
-                                      text: level,
-                                      iconColor: Colors.white,
-                                      textColor: Colors.white,
-                                    ),
-                                    const SizedBox(height: 10),
-                                    IconText(
-                                      icon: Icons.access_time,
-                                      text: time,
-                                      iconColor: Colors.white,
-                                      textColor: Colors.white,
-                                    ),
-                                  ],
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      IconText(
+                                        icon: Icons.business_center,
+                                        text: level,
+                                        iconColor: Colors.white,
+                                        textColor: Colors.white,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      IconText(
+                                        icon: Icons.access_time,
+                                        text: time,
+                                        iconColor: Colors.white,
+                                        textColor: Colors.white,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    IconText(
-                                      icon: Icons.location_on,
-                                      text: location,
-                                      iconColor: Colors.white,
-                                      textColor: Colors.white,
-                                    ),
-                                    const SizedBox(height: 10),
-                                    IconText(
-                                      icon: Icons.calendar_today,
-                                      text: type,
-                                      iconColor: Colors.white,
-                                      textColor: Colors.white,
-                                    ),
-                                  ],
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      IconText(
+                                        icon: Icons.location_on,
+                                        text: location,
+                                        iconColor: Colors.white,
+                                        textColor: Colors.white,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      IconText(
+                                        icon: Icons.calendar_today,
+                                        text: type,
+                                        iconColor: Colors.white,
+                                        textColor: Colors.white,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -195,129 +197,91 @@ class JobDetails extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Divider and other content
-                  const Padding(
-                    padding: EdgeInsets.only(top: 0, left: 10, right: 10),
-                    child: Divider(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
+                  // Rest of the content
+                  const SizedBox(height: 16),
+                  const Divider(color: Colors.grey),
+                  const SizedBox(height: 16),
                   Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      'About $company',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(27, 27, 27, 1),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0, right: 10),
-                    child: Text(
-                      aboutCompany,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                        color: Color.fromRGBO(27, 27, 27, 1),
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-                  // Divider and other content
-                  const Padding(
-                    padding: EdgeInsets.only(top: 0, left: 10, right: 10),
-                    child: Divider(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      'About Job',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(27, 27, 27, 1),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0, right: 10),
-                    child: Text(
-                      aboutPosition,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                        color: Color.fromRGBO(27, 27, 27, 1),
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-                  // divider
-                  const Padding(
-                    padding: EdgeInsets.only(top: 0, left: 10, right: 10),
-                    child: Divider(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      'Job Responsibilities',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(27, 27, 27, 1),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0, right: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: responsibilities
-                          .map((responsibility) => BulletPoint(responsibility))
-                          .toList(),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // divider
-                  const Padding(
-                    padding: EdgeInsets.only(top: 0, left: 10, right: 10),
-                    child: Divider(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      'Qualifications Required',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(27, 27, 27, 1),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0, right: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: qualifications
-                          .map((qualification) => BulletPoint(qualification))
-                          .toList(),
+                      children: [
+                        Text(
+                          'About $company',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(27, 27, 27, 1),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          aboutCompany,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromRGBO(27, 27, 27, 1),
+                          ),
+                          textAlign: TextAlign.justify,
+                        ),
+                        const SizedBox(height: 16),
+                        const Divider(color: Colors.grey),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'About Job',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(27, 27, 27, 1),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          aboutPosition,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromRGBO(27, 27, 27, 1),
+                          ),
+                          textAlign: TextAlign.justify,
+                        ),
+                        const SizedBox(height: 16),
+                        const Divider(color: Colors.grey),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Job Responsibilities',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(27, 27, 27, 1),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: responsibilities
+                              .map((responsibility) => BulletPoint(responsibility))
+                              .toList(),
+                        ),
+                        const SizedBox(height: 16),
+                        const Divider(color: Colors.grey),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Qualifications Required',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(27, 27, 27, 1),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: qualifications
+                              .map((qualification) => BulletPoint(qualification))
+                              .toList(),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -325,12 +289,11 @@ class JobDetails extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: 3,
+            bottom: 16,
             left: 20,
             right: 20,
             child: Container(
               height: 60,
-              width: double.infinity,
               decoration: BoxDecoration(
                 color: const Color(0xFF2D82FF),
                 borderRadius: BorderRadius.circular(8),
@@ -339,9 +302,10 @@ class JobDetails extends StatelessWidget {
                 child: Text(
                   'Apply Now',
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
